@@ -15,21 +15,25 @@ import (
 	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
+// MongoRepository implements Mongo CRUD operations for a single collection.
 type MongoRepository struct {
 	_collection  *mongo.Collection
 	_constructor func() any
 }
 
+// MongoTRepository wraps a base repository with typed entity methods.
 type MongoTRepository[T interface{}] struct {
 	_base interfaces.IMongoRepository
 }
 
+// NewMongoTRepositoryOfCollection creates a typed repository for an explicit collection name.
 func NewMongoTRepositoryOfCollection[T interface{}](collectionName string, mClient libmongo.IMongoClient) interfaces.TMongoRepository[T] {
 	return &MongoTRepository[T]{
 		_base: NewMongoRepository[T](collectionName, mClient),
 	}
 }
 
+// NewMongoTRepository creates a typed repository using the inferred collection name for T.
 func NewMongoTRepository[T interface{}](mClient libmongo.IMongoClient) interfaces.TMongoRepository[T] {
 	var entity T
 	collectionName, err := mClient.GetCollectionName(entity)
@@ -41,6 +45,7 @@ func NewMongoTRepository[T interface{}](mClient libmongo.IMongoClient) interface
 	}
 }
 
+// NewMongoRepository creates an untyped Mongo repository bound to collectionName.
 func NewMongoRepository[T interface{}](collectionName string, mClient libmongo.IMongoClient) interfaces.IMongoRepository {
 	return &MongoRepository{
 		_collection: mClient.GetDatabase().Collection(collectionName),
@@ -51,14 +56,17 @@ func NewMongoRepository[T interface{}](collectionName string, mClient libmongo.I
 	}
 }
 
+// Base returns the underlying untyped repository implementation.
 func (r *MongoTRepository[T]) Base() interfaces.IMongoRepository {
 	return r._base
 }
 
+// Collection returns the active Mongo collection for typed repository operations.
 func (r *MongoTRepository[T]) Collection() *mongo.Collection {
 	return r._base.Collection()
 }
 
+// Collection returns the active Mongo collection for untyped repository operations.
 func (r *MongoRepository) Collection() *mongo.Collection {
 	return r._collection
 }
@@ -109,6 +117,7 @@ func (r *MongoRepository) GetWithOptions(ctx *context.Context, query bson.M, mon
 	return _result, err
 }
 
+// _mongoGetWithOptions executes a find query and decodes each cursor item via fn.
 func _mongoGetWithOptions(ctx *context.Context, query bson.M, collection *mongo.Collection,
 	fn func(func(val interface{}) error) error, mongoOptions *options.FindOptions) error {
 
@@ -137,6 +146,7 @@ func _mongoGetWithOptions(ctx *context.Context, query bson.M, collection *mongo.
 	return nil
 }
 
+// MongoPaginationOptions builds find options from page number and page size values.
 func MongoPaginationOptions(pageNo, pageSize int64) *options.FindOptions {
 	skip := pageNo*pageSize - pageSize
 	options := &options.FindOptions{

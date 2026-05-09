@@ -21,7 +21,7 @@ type CacheEntity struct {
 	ExpireAt time.Time `bson:"_expireAt"`
 }
 
-// must: while use mongo as cache or do manually
+// MongoIndex returns a TTL index model for cache expiration in MongoDB.
 func MongoIndex() mongo.IndexModel {
 	return mongo.IndexModel{
 		Keys:    bson.D{{Key: "_expireAt", Value: 1}},
@@ -29,6 +29,7 @@ func MongoIndex() mongo.IndexModel {
 	}
 }
 
+// ICache defines core cache operations independent of backend.
 type ICache interface {
 	Set(ctx *context.Context, key string, value []byte, ttlInMinutes ...int) error
 	GetMany(ctx *context.Context, key ...string) ([][]byte, error)
@@ -37,16 +38,19 @@ type ICache interface {
 	Type() string
 }
 
+// IMongoCache defines cache behavior for Mongo-backed cache clients.
 type IMongoCache interface {
 	Mongo() *mongo.Collection
 	ICache
 }
 
+// IRedisCache defines cache behavior for Redis-backed cache clients.
 type IRedisCache interface {
 	Redis() *redis.Client
 	ICache
 }
 
+// Client provides Redis and Mongo-backed cache operations with fallback behavior.
 type Client struct {
 	_mongo *mongo.Collection
 	_redis *redis.Client
@@ -203,10 +207,12 @@ func (c *Client) Set(ctx *context.Context, key string, value []byte, ttlInMinute
 
 var _default ICache
 
+// Default returns the configured default cache instance.
 func Default() ICache {
 	return _default
 }
 
+// GetClient returns the default cache client as *Client when available.
 func GetClient() *Client {
 	if v, ok := _default.(*Client); ok && v != nil {
 		return v
@@ -214,6 +220,7 @@ func GetClient() *Client {
 	return nil
 }
 
+// NewMongoCache creates and registers a Mongo-backed default cache client.
 func NewMongoCache(collectionName string, db *mongo.Database, ttlInMinutes ...int) IMongoCache {
 	var ttl *int
 	if len(ttlInMinutes) > 0 {
@@ -227,10 +234,12 @@ func NewMongoCache(collectionName string, db *mongo.Database, ttlInMinutes ...in
 	return mc
 }
 
+// AddMongo attaches a Mongo collection backend to an existing client.
 func (c *Client) AddMongo(collectionName string, db *mongo.Database) {
 	c._mongo = db.Collection(collectionName)
 }
 
+// NewRedisCache creates and registers a Redis-backed default cache client.
 func NewRedisCache(ttlInMinutes ...int) IRedisCache {
 	var ttl *int
 	if len(ttlInMinutes) > 0 {
@@ -244,20 +253,24 @@ func NewRedisCache(ttlInMinutes ...int) IRedisCache {
 	return rc
 }
 
+// AddRedis attaches a Redis backend to an existing client.
 func (c *Client) AddRedis() {
 	//TODO
 }
 
+// NewCache sets and returns the default cache from a custom factory.
 func NewCache(client func() ICache) ICache {
 	_default = client()
 	return _default
 }
 
+// CacheOptions defines cache operation overrides for client and TTL.
 type CacheOptions struct {
 	Client ICache
 	TTL    int //in minutes
 }
 
+// Get fetches and msgpack-decodes a typed value from cache.
 func Get[T any](ctx *context.Context, key string, client ...ICache) (*T, error) {
 	var data T
 	cc := _default
@@ -276,6 +289,7 @@ func Get[T any](ctx *context.Context, key string, client ...ICache) (*T, error) 
 	return &data, nil
 }
 
+// GetMany fetches and msgpack-decodes multiple typed values from cache.
 func GetMany[T any](ctx *context.Context, keys []string, client ...ICache) ([]T, error) {
 	cc := _default
 	if len(client) > 0 && client[0] != nil {
@@ -295,6 +309,7 @@ func GetMany[T any](ctx *context.Context, keys []string, client ...ICache) ([]T,
 	return nil, errors.New("empty result")
 }
 
+// Set msgpack-encodes and stores a typed value in cache.
 func Set[T any](ctx *context.Context, key string, value *T, option ...CacheOptions) error {
 	var ttl []int
 	client := _default
@@ -315,6 +330,7 @@ func Set[T any](ctx *context.Context, key string, value *T, option ...CacheOptio
 	return nil
 }
 
+// SetJson JSON-encodes and stores a value in cache.
 func SetJson(ctx *context.Context, key string, value any, option ...CacheOptions) error {
 	var ttl []int
 	client := _default
@@ -335,6 +351,7 @@ func SetJson(ctx *context.Context, key string, value any, option ...CacheOptions
 	return nil
 }
 
+// Delete removes one or more keys from cache.
 func Delete(ctx *context.Context, keys []string, client ...ICache) error {
 	cc := _default
 	if len(client) > 0 && client[0] != nil {
@@ -345,11 +362,13 @@ func Delete(ctx *context.Context, keys []string, client ...ICache) error {
 	return cc.Delete(ctx, keys...)
 }
 
+// MongoOptions defines Mongo cache operation overrides.
 type MongoOptions struct {
 	Client IMongoCache
 	TTL    int //in minutes
 }
 
+// SetBson applies Mongo update operators to an existing cached document.
 func SetBson(ctx *context.Context, key string, updates []bson.M, option ...MongoOptions) error {
 	var ttl []int
 	var cache IMongoCache

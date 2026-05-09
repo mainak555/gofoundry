@@ -9,6 +9,7 @@ import (
 	"github.com/spf13/viper"
 )
 
+// Configure loads environment-specific configuration into T using Viper.
 func Configure[T interface{}](configPath string) (settings *T, err error) {
 	envName := os.Getenv("NODE_ENV")
 	if envName == "" {

@@ -13,6 +13,7 @@ import (
 	"golang.org/x/exp/slices"
 )
 
+// RequestPaginationCtx reads pageNo/pageSize query parameters and stores pagination in request context.
 func RequestPaginationCtx(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		page := &dtos.Pagination{}
@@ -43,6 +44,7 @@ func RequestPaginationCtx(next http.Handler) http.Handler {
 	})
 }
 
+// UrlQueryFilterCtx parses the filter query parameter as JSON and stores it in context.
 func UrlQueryFilterCtx(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		query := make(map[string]interface{})
@@ -56,6 +58,7 @@ func UrlQueryFilterCtx(next http.Handler) http.Handler {
 	})
 }
 
+// UrlQuerySortCtx parses the sort query parameter as JSON and stores it in context.
 func UrlQuerySortCtx(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		query := make(map[string]*bool)
@@ -68,6 +71,7 @@ func UrlQuerySortCtx(next http.Handler) http.Handler {
 	})
 }
 
+// UrlQueryParamsCtx stores non-filter query parameters in request context.
 func UrlQueryParamsCtx(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		queryParams := r.URL.Query()
@@ -82,6 +86,7 @@ func UrlQueryParamsCtx(next http.Handler) http.Handler {
 	})
 }
 
+// UrlTQueryParamsCtx maps URL query parameters into a typed struct and stores it in context.
 func UrlTQueryParamsCtx[T any](next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		var params T

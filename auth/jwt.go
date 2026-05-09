@@ -13,11 +13,13 @@ import (
 	"github.com/golang-jwt/jwt/v5"
 )
 
+// GetJWT parses tokenStr without signature verification and returns the token object.
 func GetJWT(tokenStr string) (*jwt.Token, error) {
 	token, _, err := new(jwt.Parser).ParseUnverified(tokenStr, jwt.MapClaims{})
 	return token, err
 }
 
+// GetClaims returns map claims from tokenStr without signature verification.
 func GetClaims(tokenStr string) (*jwt.MapClaims, error) {
 	if token, err := GetJWT(tokenStr); err != nil {
 		return nil, err
@@ -28,6 +30,7 @@ func GetClaims(tokenStr string) (*jwt.MapClaims, error) {
 	}
 }
 
+// ValidateJWTIssuer validates issuer claims against issuerUrl and returns token claims.
 func ValidateJWTIssuer(tokenStr, issuerUrl string, audiences ...string) (*jwt.MapClaims, error) {
 	if token, err := GetJWT(tokenStr); err != nil {
 		return nil, err
@@ -40,6 +43,7 @@ func ValidateJWTIssuer(tokenStr, issuerUrl string, audiences ...string) (*jwt.Ma
 	}
 }
 
+// ValidateJWTSignature validates tokenStr against a JWKS endpoint and returns claims.
 func ValidateJWTSignature(tokenStr, jwksUrl string) (*jwt.MapClaims, error) {
 	if token, err := GetJWT(tokenStr); err != nil {
 		return nil, err

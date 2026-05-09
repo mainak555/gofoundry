@@ -19,11 +19,15 @@ import (
 )
 
 const (
+	// YYYYMMDDhhmmss is the default date-time layout used across utility helpers.
 	YYYYMMDDhhmmss = "2006-01-02 15:04:05"
-	YYYYMMDD       = "2006-01-02"
-	MAX_PAGE_SIZE  = 25000
+	// YYYYMMDD is the default date-only layout used across utility helpers.
+	YYYYMMDD = "2006-01-02"
+	// MAX_PAGE_SIZE is the upper page size bound used by query pagination helpers.
+	MAX_PAGE_SIZE = 25000
 )
 
+// GetEntityName returns the struct type name for T.
 func GetEntityName[T any]() (string, error) {
 	var entity T
 	if reflect.TypeOf(entity).Kind() != reflect.Struct {
@@ -32,6 +36,7 @@ func GetEntityName[T any]() (string, error) {
 	return reflect.TypeOf(entity).Name(), nil
 }
 
+// ToJson marshals obj into a JSON string.
 func ToJson[T interface{}](obj *T) string {
 	json, err := json.Marshal(*obj)
 	if err != nil {
@@ -40,6 +45,7 @@ func ToJson[T interface{}](obj *T) string {
 	return string(json)
 }
 
+// Unmarshal converts an arbitrary value into T by JSON round-tripping.
 func Unmarshal[T any](data any) (*T, error) {
 	var tmp T
 	bytes, err := json.Marshal(data)
@@ -51,10 +57,12 @@ func Unmarshal[T any](data any) (*T, error) {
 	return &tmp, nil
 }
 
+// ToTimePtr returns a pointer to t.
 func ToTimePtr(t time.Time) *time.Time {
 	return &t
 }
 
+// MapSlice maps each element of a into a new value using f.
 func MapSlice[T any, M any](a []T, f func(T) M) []M {
 	n := make([]M, len(a))
 	for i, e := range a {
@@ -63,6 +71,7 @@ func MapSlice[T any, M any](a []T, f func(T) M) []M {
 	return n
 }
 
+// PanicError panics when err is non-nil after printing the error message.
 func PanicError(err error) {
 	if err != nil {
 		fmt.Println(err.Error())
@@ -70,6 +79,7 @@ func PanicError(err error) {
 	}
 }
 
+// StringArrayToObjectIDArray parses one or more hex strings into Mongo ObjectIDs.
 func StringArrayToObjectIDArray(ids ...string) ([]primitive.ObjectID, error) {
 	var arrayOfIds []primitive.ObjectID
 	for _, num := range ids {
@@ -83,6 +93,7 @@ func StringArrayToObjectIDArray(ids ...string) ([]primitive.ObjectID, error) {
 	return arrayOfIds, nil
 }
 
+// ObjectIDArrayToStringArray converts ObjectIDs into hex string values.
 func ObjectIDArrayToStringArray(ids ...primitive.ObjectID) []string {
 	var arrayOfIds []string
 	for _, num := range ids {
@@ -92,6 +103,7 @@ func ObjectIDArrayToStringArray(ids ...primitive.ObjectID) []string {
 	return arrayOfIds
 }
 
+// FindDuplicates returns duplicate entries from arr.
 func FindDuplicates(arr []string) []string {
 	seen := make(map[string]bool)
 	duplicates := []string{}
@@ -105,6 +117,7 @@ func FindDuplicates(arr []string) []string {
 	return duplicates
 }
 
+// StringDateArrayToTimeDateArray parses date strings using the provided layout.
 func StringDateArrayToTimeDateArray(format string, dates ...string) ([]time.Time, error) {
 	var arrayOfDates []time.Time
 	if format == "" {
@@ -120,6 +133,7 @@ func StringDateArrayToTimeDateArray(format string, dates ...string) ([]time.Time
 	return arrayOfDates, nil
 }
 
+// StringToDate parses date into time.Time when input is non-empty.
 func StringToDate(date *string, format string) (*time.Time, error) {
 	if date != nil && *date != "" {
 		if date, err := StringDateArrayToTimeDateArray(format, *date); err == nil {
@@ -131,6 +145,7 @@ func StringToDate(date *string, format string) (*time.Time, error) {
 	return nil, nil
 }
 
+// StructMap hydrates exported fields on entity using values returned by callBack.
 func StructMap[T any](callBack func(key string) string, entity *T) error {
 	if reflect.TypeOf(*entity).Kind() != reflect.Struct {
 		return errors.New("unknown struct type")
@@ -168,6 +183,7 @@ func StructMap[T any](callBack func(key string) string, entity *T) error {
 	return nil
 }
 
+// ChunkBySplitSize partitions array into slices of at most size entries.
 func ChunkBySplitSize[T any](array []T, size int) (chunks [][]T) {
 	for size < len(array) {
 		array, chunks = array[size:], append(chunks, array[0:size:size])
@@ -175,6 +191,7 @@ func ChunkBySplitSize[T any](array []T, size int) (chunks [][]T) {
 	return append(chunks, array)
 }
 
+// ChunkBySplitNumber splits array into number chunks with near-equal size.
 func ChunkBySplitNumber[T any](array []T, number int) (chunks [][]T) {
 	length := len(array)
 	size := (length + number - 1) / number
@@ -188,12 +205,14 @@ func ChunkBySplitNumber[T any](array []T, number int) (chunks [][]T) {
 	return chunks
 }
 
+// MD5Hash returns the MD5 hash of input in hex format.
 func MD5Hash(input string) string {
 	byteInput := []byte(input)
 	md5Hash := md5.Sum(byteInput)
 	return hex.EncodeToString(md5Hash[:]) // by referring to it as a string
 }
 
+// AESEncryptBase64 encrypts value using passPhrase and returns base64 ciphertext.
 func AESEncryptBase64(value []byte, passPhrase string) (base64String string, err error) {
 	aesBlock, err := aes.NewCipher([]byte(MD5Hash(passPhrase)))
 	if err != nil {
@@ -214,6 +233,7 @@ func AESEncryptBase64(value []byte, passPhrase string) (base64String string, err
 	return base64.StdEncoding.EncodeToString(cipheredByte), nil
 }
 
+// AESDecryptBase64 decrypts base64 ciphertext generated by AESEncryptBase64.
 func AESDecryptBase64(base64String, passPhrase string) (value []byte, err error) {
 	ciphered, err := base64.StdEncoding.DecodeString(base64String)
 	if err != nil {
@@ -235,6 +255,7 @@ func AESDecryptBase64(base64String, passPhrase string) (value []byte, err error)
 	return gcmInstance.Open(nil, nonce, cipheredText, nil)
 }
 
+// RandomString generates a random string using chars or numeric defaults.
 func RandomString(length int, chars ...rune) (*string, error) {
 	var table []byte
 	if len(chars) > 0 {
@@ -256,6 +277,7 @@ func RandomString(length int, chars ...rune) (*string, error) {
 	return &str, nil
 }
 
+// RandomNumbers generates count random unsigned integers with fixed digit length.
 func RandomNumbers(count, length int) ([]uint64, error) {
 	var result []uint64
 	for i := 0; i < count; i++ {

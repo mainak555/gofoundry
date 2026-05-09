@@ -11,6 +11,7 @@ import (
 	kitlog "github.com/go-kit/log"
 )
 
+// ApiRouter provides fluent route composition for endpoint-driven HTTP handlers.
 type ApiRouter struct {
 	Router             chi.Router
 	Endpoint           IEndpoints
@@ -20,6 +21,7 @@ type ApiRouter struct {
 	Decoder            IApiRouterRequestDecoder
 }
 
+// NewApiRouter creates a composable chi router wrapper for go-kit endpoints.
 func NewApiRouter(mongoClient libmongo.IMongoClient, logger kitlog.Logger, khttpServerOptions []kithttp.ServerOption,
 	endpoint IEndpoints, decoders IApiRouterRequestDecoder, router chi.Router) *ApiRouter {
 	var r chi.Router
@@ -38,11 +40,13 @@ func NewApiRouter(mongoClient libmongo.IMongoClient, logger kitlog.Logger, khttp
 	}
 }
 
+// Extend applies apiRouter to the current router and returns the same instance.
 func (ar *ApiRouter) Extend(apiRouter func(ar *ApiRouter)) *ApiRouter {
 	apiRouter(ar)
 	return ar
 }
 
+// AddGetAll registers the default list route on the current router.
 func (ar *ApiRouter) AddGetAll() *ApiRouter {
 	ar.Router.Method("GET", "/", kithttp.NewServer(
 		ar.Endpoint.GetAllEndpoint(),
@@ -53,6 +57,7 @@ func (ar *ApiRouter) AddGetAll() *ApiRouter {
 	return ar
 }
 
+// AddCreateOne registers the default create route on the current router.
 func (ar *ApiRouter) AddCreateOne(decoderFn kithttp.DecodeRequestFunc) *ApiRouter {
 	ar.Router.Method("POST", "/", kithttp.NewServer(
 		ar.Endpoint.CreateOneEndpoint(),
@@ -63,6 +68,7 @@ func (ar *ApiRouter) AddCreateOne(decoderFn kithttp.DecodeRequestFunc) *ApiRoute
 	return ar
 }
 
+// AddGetById registers the default read-by-id route on the current router.
 func (ar *ApiRouter) AddGetById() *ApiRouter {
 	ar.Router.Get("/{id}", kithttp.NewServer(
 		ar.Endpoint.GetByIdEndpoint(),
@@ -73,6 +79,7 @@ func (ar *ApiRouter) AddGetById() *ApiRouter {
 	return ar
 }
 
+// AddUpdateById registers the default update-by-id route on the current router.
 func (ar *ApiRouter) AddUpdateById(decoderFn kithttp.DecodeRequestFunc) *ApiRouter {
 	ar.Router.Put("/{id}", kithttp.NewServer(
 		ar.Endpoint.UpdateByIdEndpoint(),
@@ -83,6 +90,7 @@ func (ar *ApiRouter) AddUpdateById(decoderFn kithttp.DecodeRequestFunc) *ApiRout
 	return ar
 }
 
+// AddDeleteById registers the default delete-by-id route on the current router.
 func (ar *ApiRouter) AddDeleteById() *ApiRouter {
 	ar.Router.Delete("/{id}", kithttp.NewServer(
 		ar.Endpoint.DeleteByIdEndpoint(),
@@ -93,6 +101,7 @@ func (ar *ApiRouter) AddDeleteById() *ApiRouter {
 	return ar
 }
 
+// AddDeleteMany registers the default bulk-delete route on the current router.
 func (ar *ApiRouter) AddDeleteMany() *ApiRouter {
 	ar.Router.Put("/delete", kithttp.NewServer(
 		ar.Endpoint.DeleteEndpoint(),
@@ -103,6 +112,7 @@ func (ar *ApiRouter) AddDeleteMany() *ApiRouter {
 	return ar
 }
 
+// AddRoute creates a nested route group using endpoint and decoder overrides.
 func (ar *ApiRouter) AddRoute(pattern string, endpoint IEndpoints, decoder IApiRouterRequestDecoder, routeFn func(ar *ApiRouter)) *ApiRouter {
 	ar.Router.Route(pattern, func(r chi.Router) {
 		childRouter := NewApiRouter(ar.MongoClient, ar.Logger, ar.KhttpServerOptions, endpoint, decoder, r)
@@ -156,11 +166,13 @@ func (ar *ApiRouter) Route(pattern string, fn func(r chi.Router)) *ApiRouter {
 	return ar
 }
 
+// With returns a child router with additional middlewares applied.
 func (ar *ApiRouter) With(middlewares ...func(http.Handler) http.Handler) *ApiRouter {
 	childRouter := NewApiRouter(ar.MongoClient, ar.Logger, ar.KhttpServerOptions, ar.Endpoint, ar.Decoder, ar.Router.With(middlewares...))
 	return childRouter
 }
 
+// New returns a child router with endpoint and decoder overrides.
 func (ar *ApiRouter) New(endpoint IEndpoints, decoder IApiRouterRequestDecoder, middlewares ...func(http.Handler) http.Handler) *ApiRouter {
 	childRouter := NewApiRouter(ar.MongoClient, ar.Logger, ar.KhttpServerOptions, endpoint, decoder, ar.Router.With(middlewares...))
 	return childRouter
