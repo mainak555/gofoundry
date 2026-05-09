@@ -4,6 +4,20 @@ GoFoundry is a reusable Go library for building service backends with a consiste
 
 This repository focuses on composable building blocks rather than a framework runtime, so teams can adopt only the packages they need.
 
+## Core Composition Pattern
+
+Most services built with GoFoundry follow this startup sequence:
+
+1. Load environment-aware settings with `util.Configure[T]`.
+2. Optionally hydrate secrets from Azure Key Vault with `util.GetVault` and `util.GetFromVault`.
+3. Create and connect Mongo with `mongodb.NewMongoClient`.
+4. Register collections and indexes with `IMongoClient.ConfigureCollections`.
+5. Compose chi middlewares with `middlewares.AddMiddlewares`.
+6. Attach OIDC guards with `oidc.ValidateToken` and `oidc.IsRoleAny`.
+7. Build endpoint handlers with `generics.ApiRouter`.
+8. Wire transport behavior with `server.KitHttpServerOptions` or explicit go-kit options.
+9. Start HTTP server and gracefully shutdown on OS signals.
+
 ## What Is Included
 
 - Authentication helpers for JWT/OIDC workflows.
@@ -36,13 +50,49 @@ For first-level setup:
 4. Compose endpoints and route handlers with http/chi and generics router helpers.
 5. Add auth middleware from http/oidc and auth packages where required.
 
-Detailed usage pages are linked below. Example projects will be added in the next documentation iteration.
+Minimal startup sketch:
+
+```go
+package main
+
+import (
+	"context"
+
+	libmongo "gofoundry/db/mongodb"
+	"gofoundry/models"
+	"gofoundry/util"
+)
+
+type AppConfig struct {
+	MongoDb models.MongoConnection
+}
+
+func bootstrap(ctx *context.Context) (libmongo.IMongoClient, *AppConfig) {
+	settings, err := util.Configure[AppConfig]("./config")
+	util.PanicError(err)
+
+	mc, err := libmongo.NewMongoClient(
+		ctx,
+		settings.MongoDb.ConnectionString,
+		settings.MongoDb.DbName,
+		nil,
+		nil,
+	)
+	util.PanicError(err)
+
+	return mc, settings
+}
+```
+
+Detailed usage pages and example-driven guides are linked below.
 
 ## Documentation Map
 
 - [Getting Started](docs/GETTING_STARTED.md)
 - [Architecture](docs/ARCHITECTURE.md)
 - [API Overview](docs/API_OVERVIEW.md)
+- [HTTP Transport](docs/HTTP_TRANSPORT.md)
+- [Advanced Examples](docs/ADVANCED_EXAMPLES.md)
 - [Configuration](docs/CONFIGURATION.md)
 - [Error Handling](docs/ERROR_HANDLING.md)
 - [Code Standards](docs/CODE_STANDARDS.md)
