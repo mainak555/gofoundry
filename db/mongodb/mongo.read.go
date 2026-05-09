@@ -3,7 +3,7 @@ package mongodb
 import (
 	"context"
 
-	"dtos"
+	"gofoundry/dtos"
 
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"

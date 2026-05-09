@@ -7,7 +7,7 @@ import (
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/render"
 
-	"http/chi/renderers"
+	"gofoundry/http/chi/renderers"
 )
 
 func ValidateIdCtx(idValidator func(ctx *context.Context, id string) error) func(http.Handler) http.Handler {

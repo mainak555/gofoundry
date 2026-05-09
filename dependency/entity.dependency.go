@@ -3,7 +3,8 @@ package dependency
 import (
 	"context"
 
-	"util"
+	"gofoundry/util"
+
 	"golang.org/x/exp/maps"
 	"golang.org/x/exp/slices"
 )

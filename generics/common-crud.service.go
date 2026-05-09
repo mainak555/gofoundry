@@ -3,11 +3,11 @@ package generics
 import (
 	"context"
 
-	libmongo "db/mongodb"
-	"dtos"
-	"helpers"
-	"repository"
-	"repository/interfaces"
+	libmongo "gofoundry/db/mongodb"
+	"gofoundry/dtos"
+	"gofoundry/helpers"
+	"gofoundry/repository"
+	"gofoundry/repository/interfaces"
 
 	"go.mongodb.org/mongo-driver/bson"
 )

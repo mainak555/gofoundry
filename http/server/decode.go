@@ -6,7 +6,7 @@ import (
 	"io"
 	"net/http"
 
-	"dtos"
+	"gofoundry/dtos"
 )
 
 func DecodeRequestBody[T interface{}](_ context.Context, r *http.Request) (interface{}, error) {

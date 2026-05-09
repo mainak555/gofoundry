@@ -4,7 +4,7 @@ import (
 	"context"
 	"net/http"
 
-	libChi "http/chi"
+	libChi "gofoundry/http/chi"
 )
 
 func UrlRouteParamsCtx(next http.Handler) http.Handler {

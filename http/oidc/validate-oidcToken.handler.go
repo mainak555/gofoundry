@@ -9,9 +9,10 @@ import (
 	"strings"
 	"time"
 
-	"auth"
-	"http/chi/renderers"
-	"models"
+	"gofoundry/auth"
+	"gofoundry/http/chi/renderers"
+	"gofoundry/models"
+
 	"github.com/coreos/go-oidc"
 	"github.com/go-chi/render"
 )

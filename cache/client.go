@@ -6,7 +6,7 @@ import (
 	"errors"
 	"time"
 
-	"db/mongodb"
+	"gofoundry/db/mongodb"
 
 	"github.com/redis/go-redis/v9"
 	"github.com/vmihailenco/msgpack/v5"

@@ -6,7 +6,7 @@ import (
 	"fmt"
 	"strings"
 
-	"dtos"
+	"gofoundry/dtos"
 )
 
 func GetPagination(ctx *context.Context) *dtos.Pagination {

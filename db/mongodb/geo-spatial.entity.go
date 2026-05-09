@@ -3,7 +3,7 @@ package mongodb
 import (
 	"errors"
 
-	"db"
+	"gofoundry/db"
 )
 
 type GeoSpatialType string
