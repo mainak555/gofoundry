@@ -1,7 +1,7 @@
 package helpers
 
 import (
-	"gofoundry/util"
+	"github.com/mainak555/gofoundry/util"
 
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"

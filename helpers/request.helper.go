@@ -6,7 +6,7 @@ import (
 	"fmt"
 	"strings"
 
-	"gofoundry/dtos"
+	"github.com/mainak555/gofoundry/dtos"
 )
 
 // GetPagination returns pagination data from context.

@@ -7,7 +7,7 @@ import (
 	"reflect"
 	"time"
 
-	"gofoundry/util"
+	"github.com/mainak555/gofoundry/util"
 
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"

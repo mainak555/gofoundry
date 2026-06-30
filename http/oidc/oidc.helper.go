@@ -5,7 +5,7 @@ import (
 	"errors"
 	"net/http"
 
-	"gofoundry/auth"
+	"github.com/mainak555/gofoundry/auth"
 
 	"github.com/coreos/go-oidc"
 )

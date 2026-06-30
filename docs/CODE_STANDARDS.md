@@ -14,7 +14,7 @@
 
 ## Imports
 
-- Use module-qualified local imports: gofoundry/<package>.
+- Use module-qualified local imports: github.com/mainak555/gofoundry/<package>.
 - Keep imports grouped by stdlib, internal module, external dependencies.
 
 ## Error Handling

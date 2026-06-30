@@ -3,8 +3,8 @@ package generics
 import (
 	"net/http"
 
-	libmongo "gofoundry/db/mongodb"
-	"gofoundry/http/server"
+	libmongo "github.com/mainak555/gofoundry/db/mongodb"
+	"github.com/mainak555/gofoundry/http/server"
 
 	"github.com/go-chi/chi/v5"
 	kithttp "github.com/go-kit/kit/transport/http"

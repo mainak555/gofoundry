@@ -1,4 +1,4 @@
-module gofoundry
+module github.com/mainak555/gofoundry
 
 go 1.26.3
 

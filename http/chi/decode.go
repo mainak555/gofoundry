@@ -5,8 +5,8 @@ import (
 	"errors"
 	"net/http"
 
-	"gofoundry/http/server"
-	"gofoundry/util"
+	"github.com/mainak555/gofoundry/http/server"
+	"github.com/mainak555/gofoundry/util"
 
 	"github.com/go-chi/chi/v5"
 	"golang.org/x/exp/slices"

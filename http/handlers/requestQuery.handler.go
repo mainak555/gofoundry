@@ -6,9 +6,9 @@ import (
 	"net/http"
 	"strconv"
 
-	"gofoundry/dtos"
-	"gofoundry/helpers"
-	"gofoundry/util"
+	"github.com/mainak555/gofoundry/dtos"
+	"github.com/mainak555/gofoundry/helpers"
+	"github.com/mainak555/gofoundry/util"
 
 	"golang.org/x/exp/slices"
 )

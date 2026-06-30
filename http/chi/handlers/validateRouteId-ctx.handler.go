@@ -6,11 +6,11 @@ import (
 	"net/http"
 	"reflect"
 
-	lm "gofoundry/db/mongodb"
-	"gofoundry/dtos"
-	"gofoundry/generics"
-	"gofoundry/http/chi"
-	"gofoundry/http/chi/renderers"
+	lm "github.com/mainak555/gofoundry/db/mongodb"
+	"github.com/mainak555/gofoundry/dtos"
+	"github.com/mainak555/gofoundry/generics"
+	"github.com/mainak555/gofoundry/http/chi"
+	"github.com/mainak555/gofoundry/http/chi/renderers"
 
 	"go.mongodb.org/mongo-driver/bson/primitive"
 

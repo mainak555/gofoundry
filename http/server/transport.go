@@ -6,7 +6,7 @@ import (
 	"net/http"
 	"strings"
 
-	"gofoundry/http/handlers"
+	"github.com/mainak555/gofoundry/http/handlers"
 
 	kithttp "github.com/go-kit/kit/transport/http"
 	kitlog "github.com/go-kit/log"

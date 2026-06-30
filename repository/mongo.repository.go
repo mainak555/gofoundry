@@ -5,9 +5,9 @@ import (
 	"reflect"
 	"time"
 
-	libmongo "gofoundry/db/mongodb"
-	"gofoundry/repository/interfaces"
-	"gofoundry/util"
+	libmongo "github.com/mainak555/gofoundry/db/mongodb"
+	"github.com/mainak555/gofoundry/repository/interfaces"
+	"github.com/mainak555/gofoundry/util"
 
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
