@@ -12,8 +12,11 @@ type BaseIdEntity struct {
 
 type BaseEntity struct {
 	BaseIdEntity `bson:",inline"`
-	CreatedAt    time.Time  `bson:"_createdAt,omitempty" json:"createdAt,omitempty"`
+	CreatedAt    time.Time  `bson:"_createdAt" json:"createdAt"`
 	UpdatedAt    *time.Time `bson:"_updatedAt,omitempty" json:"updatedAt,omitempty"`
 	DeletedAt    *time.Time `bson:"_deletedAt,omitempty" json:"deletedAt,omitempty"`
+	CreatedBy    string     `bson:"_createdBy,omitempty" json:"createdBy,omitempty"`
+	UpdatedBy    string     `bson:"_updatedBy,omitempty" json:"updatedBy,omitempty"`
+	DeletedBy    string     `bson:"_deletedBy,omitempty" json:"deletedBy,omitempty"`
 	Deleted      bool       `bson:"_deleted" json:"deleted"`
 }
